@@ -1,0 +1,124 @@
+
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html lang="en">
+<head>
+<title>Bootstrap Example</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet"
+href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+<script
+src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script
+src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+<script src="http://login2explore.com/jpdb/resources/js/0.0.3/jpdb-commons.js"></script>
+</head>
+<body>
+<div class="container">
+<h2>Vertical (basic) form</h2>
+<form id="Form" method="post">
+<div class="form-group">
+<span><label for="Id">Student ID:</label> <label id="Id">
+</label></span>
+<input type="text" class="form-control" name="Id" id="Id"
+placeholder="Enter Student ID" required>
+</div>
+<div class="form-group">
+<label for="Name">Student Name:</label>
+<input type="text" class="form-control" id="Name"
+placeholder="Enter Student Name" name="Name">
+</div>
+<div class="form-group">
+<label for="College">College Name:</label>
+<input type="text" class="form-control" id="College"
+placeholder="Enter Student's College Name" name="College">
+</div>
+<input type="button" class="btn btn-primary" id="Save" value="Save"
+onclick="save();">
+</form>
+</div>
+<script>
+$("#Id").focus();
+function validateAndGetFormData() {
+var IdVar = $("#Id").val();
+if (IdVar === "") {
+alert("Student ID is empty");
+$("#Id").focus();
+return "";
+}
+var NameVar = $("#Name").val();
+if (NameVar === "") {
+alert("Student Name is Empty");
+$("#Name").focus();
+return "";
+}
+var CollegeVar = $("#College").val();
+if (CollegeVar === "") {
+alert("College Name is empty");
+$("#College").focus();
+return "";
+}
+var jsonStrObj = {
+Id: IdVar,
+Name: NameVar,
+College: CollegeVar,
+};
+return JSON.stringify(jsonStrObj);
+}
+// This method is used to create PUT Json request.
+function createPUTRequest(connToken, jsonObj, dbName, relName) {
+var putRequest = "{\n"
++ "\"token\" : \""
++ connToken
++ "\","
++ "\"dbName\": \""
++ dbName
++ "\",\n" + "\"cmd\" : \"PUT\",\n"
++ "\"rel\" : \""
++ relName + "\","
++ "\"jsonStr\": \n"
++ jsonObj
++ "\n"
++ "}";
+return putRequest;
+}
+function executeCommandAtGivenBaseUrl(reqString, dbBaseUrl, apiEndPointUrl) {
+var url = dbBaseUrl + apiEndPointUrl;
+var jsonObj;
+$.post(url, reqString, function (result) {
+jsonObj = JSON.parse(result);
+}).fail(function (result) {
+var dataJsonObj = result.responseText;
+jsonObj = JSON.parse(dataJsonObj);
+});
+return jsonObj;
+}
+function resetForm() {
+$("#Id").val("")
+$("#Name").val("");
+$("#College").val("");
+$("#Id").focus();
+}
+function save() {
+var jsonStr = validateAndGetFormData();
+if (jsonStr === "") {
+return;
+}
+var putReqStr = createPUTRequest("90937224|-31948794118213868|90933262",
+jsonStr, "SAMPLE", "Student_Form");
+alert(putReqStr);
+jQuery.ajaxSetup({async: false});
+var resultObj = executeCommand(putReqStr,
+"http://api.login2explore.com:5577", "/api/iml");
+alert(JSON.stringify(resultObj));
+jQuery.ajaxSetup({async: true});
+resetForm();
+}
+</script>
+</body>
+</html>
